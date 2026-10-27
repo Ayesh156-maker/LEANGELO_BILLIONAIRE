@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Report | Poramdula C.C.</title>
+
+<style>
+:root {
+  --gold: #d4af37;
+  --pale: #ffe7a0;
+  --bg: #080808;
+  --panel: #121212;
+  --muted: #aaa49a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 25px 18px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(ellipse at top right, #4b380d30, transparent 42%), var(--bg);
+  color: #f8f5ec;
+  min-height: 100vh;
+}
+
+.container { max-width: 1100px; margin: auto; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+  animation: reveal .5s ease both;
+}
+
+.brand {
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  font-size: 13px;
+  margin-bottom: 9px;
+}
+
+h1 { margin: 0 0 8px; font-size: clamp(25px, 4vw, 35px); }
+.muted { color: var(--muted); }
+
+.back {
+  padding: 11px 16px;
+  color: var(--pale);
+  text-decoration: none;
+  border: 1px solid #d4af3755;
+  border-radius: 9px;
+  background: #d4af370b;
+  transition: .2s;
+}
+
+.back:hover {
+  color: #080808;
+  background: var(--gold);
+  box-shadow: 0 0 22px #d4af3725;
+}
+
+.panel {
+  padding: 25px;
+  border: 1px solid #d4af3744;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #171717, #0d0d0d);
+  box-shadow: 0 12px 45px #00000040;
+  animation: reveal .65s ease both;
+}
+
+.panel h2 { color: var(--gold); margin-top: 0; }
+
+.stat {
+  display: inline-block;
+  min-width: 210px;
+  padding: 18px 22px;
+  margin: 12px 0 20px;
+  border: 1px solid #d4af3755;
+  border-radius: 12px;
+  background: #d4af370b;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 32px;
+  color: var(--gold);
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 15px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ffffff12;
+}
+
+th {
+  background: #d4af3710;
+  color: var(--pale);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
+
+tbody tr { transition: background .2s; }
+tbody tr:hover { background: #d4af370a; }
+
+.status {
+  display: inline-block;
+  color: var(--pale);
+  border: 1px solid #d4af3755;
+  background: #d4af3710;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#message { padding: 17px 0; color: var(--muted); }
+.error { color: #ff7777 !important; }
+
+footer {
+  color: #77736a;
+  text-align: center;
+  padding: 26px 0 8px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+footer span { color: var(--gold); }
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  body { padding: 17px 12px; }
+  .panel { padding: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="container">
+  <div class="topbar">
+    <div>
+      <div class="brand">✦ PORAMDULA C.C.</div>
+      <h1>Class Attendance</h1>
+      <p class="muted">Daily student attendance report</p>
+    </div>
+    <a class="back" href="dashboard.html">← Dashboard</a>
+  </div>
+
+  <section class="panel">
+    <h2 id="classTitle">Loading class...</h2>
+    <p id="reportDate" class="muted"></p>
+
+    <div class="stat">
+      <span>STUDENTS PRESENT</span>
+      <strong id="presentCount">—</strong>
+    </div>
+
+    <p id="message">Loading attendance records...</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student Name</th>
+            <th>Student ID</th>
+            <th>Arrival Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer><span>PORAMDULA C.C.</span> | ATTENDANCE PORTAL</footer>
+</main>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+
+import {
+  getFirestore, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDTLoyLTfnVCL_5S6n2pQ9sb_wuf8WX7GA",
+  authDomain: "my-cafe-ecfbb.firebaseapp.com",
+  projectId: "my-cafe-ecfbb",
+  storageBucket: "my-cafe-ecfbb.firebasestorage.app",
+  messagingSenderId: "953229492582",
+  appId: "1:953229492:web:05b8a530d2b3ded46648a7",
+  measurementId: "G-MKSKGTCJ89"
+};
+
+const className = new URLSearchParams(location.search).get("class");
+const title = document.getElementById("classTitle");
+const dateLabel = document.getElementById("reportDate");
+const countLabel = document.getElementById("presentCount");
+const message = document.getElementById("message");
+const rows = document.getElementById("attendanceRows");
+
+const now = new Date();
+const today = [
+  now.getFullYear(),
+  String(now.getMonth() + 1).padStart(2, "0"),
+  String(now.getDate()).padStart(2, "0")
+].join("-");
+
+dateLabel.textContent = "DATE: " + today;
+
+async function loadReport() {
+  if (!className || !/^(6|7|8|9|10|11|12|13)-[A-G]$/.test(className)) {
+    title.textContent = "Invalid class";
+    countLabel.textContent = "0";
+    message.textContent = "Please select a class from the dashboard.";
+    message.classList.add("error");
+    return;
+  }
+
+  const [grade, section] = className.split("-");
+  title.textContent = `Grade ${grade} — Class ${section}`;
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const attendanceQuery = query(
+      collection(db, "attendance"),
+      where("class_name", "==", className),
+      where("attendance_date", "==", today)
+    );
+
+    const snapshot = await getDocs(attendanceQuery);
+    const records = snapshot.docs.map(doc => doc.data());
+
+    records.sort((a, b) =>
+      String(a.attendance_time || "").localeCompare(
+        String(b.attendance_time || "")
+      )
+    );
+
+    countLabel.textContent = records.length;
+    rows.replaceChildren();
+
+    if (records.length === 0) {
+      message.textContent = "No attendance records found for this class today.";
+      return;
+    }
+
+    message.textContent = "";
+
+    records.forEach((student, index) => {
+      const tr = document.createElement("tr");
+
+      [
+        index + 1,
+        student.student_name || "Unknown",
+        student.student_id ?? "—",
+        student.attendance_time || "—"
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        tr.appendChild(td);
+      });
+
+      const statusCell = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "status";
+      badge.textContent = "PRESENT";
+      statusCell.appendChild(badge);
+      tr.appendChild(statusCell);
+      rows.appendChild(tr);
+    });
+  } catch (error) {
+    console.error("Attendance report error:", error);
+    countLabel.textContent = "—";
+    message.textContent =
+      "Could not load attendance. Check Firestore permissions and browser console.";
+    message.classList.add("error");
+  }
+}
+
+loadReport();
+</script>
+</body>
+</html>

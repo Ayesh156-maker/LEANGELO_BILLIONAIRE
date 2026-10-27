@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poramdula C.C. | Elite Attendance</title>
+
+<style>
+:root {
+  --gold: #d4af37;
+  --light-gold: #ffe7a0;
+  --black: #080808;
+  --panel: #121212;
+  --muted: #aaa49a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #f8f5ec;
+  background:
+    radial-gradient(ellipse at 10% 0%, #3c2c0b55, transparent 40%),
+    radial-gradient(ellipse at 90% 60%, #6d501522, transparent 38%),
+    var(--black);
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, #d4af3707 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: ambient 12s linear infinite;
+}
+
+@keyframes ambient {
+  from { background-position: 150% 0; }
+  to { background-position: -150% 0; }
+}
+
+header {
+  position: relative;
+  padding: 25px 22px;
+  border-bottom: 1px solid #d4af3744;
+  background: #090909dd;
+  backdrop-filter: blur(14px);
+}
+
+.header-inner, main, footer {
+  max-width: 1180px;
+  margin: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.logo {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--gold);
+  border-radius: 15px;
+  color: var(--gold);
+  font-size: 29px;
+  font-weight: 800;
+  box-shadow: 0 0 24px #d4af371c, inset 0 0 16px #d4af3710;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+
+.brand h1 {
+  margin-bottom: 5px;
+  font-size: clamp(22px, 4vw, 31px);
+  letter-spacing: 1.5px;
+}
+
+.brand h1 span { color: var(--gold); }
+
+.brand p {
+  color: var(--muted);
+  margin-bottom: 0;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+}
+
+main {
+  position: relative;
+  padding: 45px 20px 65px;
+}
+
+.hero {
+  padding: 36px;
+  border: 1px solid #d4af374c;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #17140c, #101010 65%, #19150b);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px;
+  animation: appear .7s ease both;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -65px;
+  top: -90px;
+  border: 1px solid #d4af3730;
+  border-radius: 50%;
+  box-shadow: 0 0 0 25px #d4af3708, 0 0 0 55px #d4af3705;
+}
+
+.eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.hero h2 {
+  font-size: clamp(27px, 5vw, 43px);
+  line-height: 1.2;
+  margin: 13px 0;
+}
+
+.hero h2 span {
+  color: var(--gold);
+}
+
+.hero p {
+  color: #aaa49a;
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 32px 0 20px;
+}
+
+.section-heading h2 { margin: 0; font-size: 22px; }
+
+.gold-line {
+  height: 2px;
+  width: 55px;
+  margin-top: 9px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.section-heading small {
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.grades {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.grade-card {
+  background: linear-gradient(145deg, #171717, #0e0e0e);
+  border: 1px solid #ffffff15;
+  border-radius: 15px;
+  padding: 21px;
+  transition: transform .25s, border-color .25s, box-shadow .25s;
+  animation: appear .55s ease both;
+}
+
+.grade-card:hover {
+  transform: translateY(-4px);
+  border-color: #d4af3780;
+  box-shadow: 0 10px 35px #d4af3710;
+}
+
+.grade-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.grade-number {
+  display: grid;
+  place-items: center;
+  min-width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  background: #d4af3712;
+  border: 1px solid #d4af374a;
+  color: var(--gold);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.grade-heading h3 { margin: 0 0 4px; font-size: 17px; }
+.grade-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+
+.sections {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.sections a {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  text-decoration: none;
+  color: #e5d6a4;
+  background: #d4af3708;
+  border: 1px solid #d4af3733;
+  border-radius: 9px;
+  padding: 12px 3px;
+  font-size: 13px;
+  font-weight: 650;
+  transition: all .22s ease;
+}
+
+.sections a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent, #ffffff28, transparent);
+  transform: translateX(-120%);
+  transition: transform .5s ease;
+}
+
+.sections a:hover {
+  color: #080808;
+  background: var(--gold);
+  border-color: var(--light-gold);
+  box-shadow: 0 0 20px #d4af3733;
+  transform: translateY(-2px);
+}
+
+.sections a:hover::before { transform: translateX(120%); }
+
+footer {
+  position: relative;
+  border-top: 1px solid #d4af3730;
+  padding: 25px 20px;
+  color: #77736a;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+footer span { color: var(--gold); }
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 650px) {
+  main { padding: 25px 13px 45px; }
+  header { padding: 19px 14px; }
+  .hero { padding: 25px 20px; }
+  .grades { grid-template-columns: 1fr; }
+  .grade-card { padding: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div>
+        <h1>PORAMDULA <span>C.C.</span></h1>
+        <p>ATTENDANCE MANAGEMENT SYSTEM</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">✦ School Administration</div>
+    <h2>Attendance, <span>Elevated.</span></h2>
+    <p>
+      Welcome to Poramdula C.C. attendance dashboard.
+      Select a grade and class to view the daily student attendance report.
+    </p>
+  </section>
+
+  <div class="section-heading">
+    <div>
+      <h2>Class Directory</h2>
+      <div class="gold-line"></div>
+    </div>
+    <small>GRADES 06 — 13</small>
+  </div>
+
+  <section class="grades" id="gradeList"></section>
+</main>
+
+<footer>
+  <span>PORAMDULA C.C.</span> &nbsp; | &nbsp;
+  STUDENT ATTENDANCE PORTAL
+</footer>
+
+<script>
+const gradeList = document.getElementById("gradeList");
+const sections = ["A", "B", "C", "D", "E", "F", "G"];
+
+for (let grade = 6; grade <= 13; grade++) {
+  const card = document.createElement("section");
+  card.className = "grade-card";
+  card.style.animationDelay = `${(grade - 6) * 55}ms`;
+
+  const heading = document.createElement("div");
+  heading.className = "grade-heading";
+
+  const number = document.createElement("div");
+  number.className = "grade-number";
+  number.textContent = String(grade);
+
+  const info = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = `Grade ${grade}`;
+  const subtitle = document.createElement("p");
+  subtitle.textContent = "Select your class section";
+
+  info.append(title, subtitle);
+  heading.append(number, info);
+
+  const grid = document.createElement("div");
+  grid.className = "sections";
+
+  sections.forEach(section => {
+    const link = document.createElement("a");
+    link.href = `class-report.html?class=${grade}-${section}`;
+    link.textContent = `Class ${section}`;
+    link.setAttribute("aria-label",
+      `Grade ${grade}, Class ${section} attendance report`);
+    grid.appendChild(link);
+  });
+
+  card.append(heading, grid);
+  gradeList.appendChild(card);
+}
+</script>
+</body>
+</html>
